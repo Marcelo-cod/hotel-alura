@@ -21,7 +21,7 @@ public class ReservaDao {
 	public void salvar(Reservas reserva) {
 		
 		try {
-			String sql = "INSERT INTO reservas(data_entrada, data_saida, valor, forma_pagamento) Values(?,?,?,?,?)";
+			String sql = "INSERT INTO reservas(data_entrada, data_saida, valor, forma_pagamento) Values(?,?,?,?)";
 			
 			try(PreparedStatement pstm = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 				

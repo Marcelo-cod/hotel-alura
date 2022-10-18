@@ -4,6 +4,9 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+
+
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -28,6 +31,7 @@ public class MenuUsuario extends JFrame {
 	int xMouse, yMouse;
 	private JLabel labelExit;
 	private JLabel labelRegistro;
+	
 
 	/**
 	 * Launch the application.

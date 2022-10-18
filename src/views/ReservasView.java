@@ -21,14 +21,20 @@ import java.awt.ItemSelectable;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import java.text.Format;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.Toolkit;
 import java.beans.PropertyChangeListener;
+import java.sql.SQLException;
 import java.beans.PropertyChangeEvent;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
@@ -49,8 +55,7 @@ public class ReservasView extends JFrame {
 	private JLabel lblValorSimbolo; 
 	private JLabel labelAtras;
 	private ReservasController reservasController;
-	private String valor = "150";
-
+	
 	/**
 	 * Launch the application.
 	 */
@@ -156,17 +161,33 @@ public class ReservasView extends JFrame {
 		txtDataS.setFont(new Font("Roboto", Font.PLAIN, 18));
 		txtDataS.addPropertyChangeListener(new PropertyChangeListener() {
 			public void propertyChange(PropertyChangeEvent evt) {
-//				String valor = "150";
+			
+				String valor;
 				String dataEntrada = ((JTextField)txtDataE.getDateEditor().getUiComponent()).getText();
 				String dataSaida = ((JTextField)txtDataS.getDateEditor().getUiComponent()).getText();
-//				Integer result = Integer.parseInt(dataSaida); 
-						//- Integer.parseInt(dataEntrada);
-				//Ativa o evento, após o usuário selecionar as datas, o valor da reserva deve ser calculado
-//				Integer valor = Integer.parseInt(txtValor.getText());
-				//txtValor.setText("350"); 
-				//String valor = Integer.toString(1560);
 				
-				System.out.println("Funcionandooo!" + dataEntrada + dataSaida );
+				if (!dataEntrada.isEmpty() && !dataSaida.isEmpty()) {
+					
+					 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+					    Date firstDate;
+					    Date secondDate;
+						try {
+							firstDate = sdf.parse(dataEntrada);
+							secondDate = sdf.parse(dataSaida);
+
+						    long diffInMillies = Math.abs(secondDate.getTime() - firstDate.getTime());
+						    long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+						    valor = String.valueOf(diff * 150);
+						    txtValor.setText(valor);
+						    
+						    
+						} catch (ParseException e) {
+							
+							e.printStackTrace();
+						}
+					    
+				}
+				
 			}
 		});
 		txtDataS.setDateFormatString("yyyy-MM-dd");
@@ -175,7 +196,7 @@ public class ReservasView extends JFrame {
 		panel.add(txtDataS);
 		
 	
-		String valu = "";
+		
 		txtValor = new JTextField();
 		txtValor.setBackground(SystemColor.text);
 		txtValor.setHorizontalAlignment(SwingConstants.CENTER);
@@ -184,7 +205,7 @@ public class ReservasView extends JFrame {
 		txtValor.setEditable(false);
 		txtValor.setFont(new Font("Roboto Black", Font.BOLD, 17));
 		txtValor.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		txtValor.setText(valu);
+		
 		panel.add(txtValor);
 		txtValor.setColumns(10);
 		
@@ -347,19 +368,18 @@ public class ReservasView extends JFrame {
 	
 	public void salvarReserva() {
 		
-		LocalDate entrada = LocalDate.now();
-		LocalDate saida = LocalDate.of(2022, Month.OCTOBER, 18);
-		String dataEntrada = ((JTextField)txtDataE.getDateEditor().getUiComponent()).getText();
-		String dataSaida = ((JTextField)txtDataS.getDateEditor().getUiComponent()).getText();
-//		Integer valor = Integer.parseInt(txtValor.getText());
-		int valor = 0;
-		
-		Period periodo = Period.between(entrada, saida);
-		
-		//Integer valor = Integer.parseInt(dataSaida) - Integer.parseInt(dataEntrada);
-		Reservas reserva = new Reservas(java.sql.Date.valueOf(dataEntrada), java.sql.Date.valueOf(dataSaida), valor, txtFormaPagamento.getSelectedItem().toString());
-		reservasController.salvar(reserva);
-		System.out.println("Funciona" + periodo);
+		try {
+			
+			String dataEntrada = ((JTextField)txtDataE.getDateEditor().getUiComponent()).getText();
+			String dataSaida = ((JTextField)txtDataS.getDateEditor().getUiComponent()).getText();
+			Integer valor = Integer.parseInt(txtValor.getText());
+			Reservas reserva = new Reservas(java.sql.Date.valueOf(dataEntrada), java.sql.Date.valueOf(dataSaida), valor, txtFormaPagamento.getSelectedItem().toString());
+			reservasController.salvar(reserva);
+						
+		} catch (Exception e) {
+			System.out.println("ERRO" + e);
+		}
+
 	}
 	
 	public Integer calculaDiferenca(String dataEntrada, String dataSaida) {

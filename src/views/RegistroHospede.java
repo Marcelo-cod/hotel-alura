@@ -7,6 +7,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
 import java.awt.Color;
 import com.toedter.calendar.JDateChooser;
+
+import controller.HospedesController;
+import modelo.Hospedes;
+import modelo.Reservas;
+import controller.HospedesController;
+
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
@@ -38,6 +44,7 @@ public class RegistroHospede extends JFrame {
 	private JLabel labelExit;
 	private JLabel labelAtras;
 	int xMouse, yMouse;
+	private HospedesController hospedesController;
 
 	/**
 	 * Launch the application.
@@ -59,6 +66,8 @@ public class RegistroHospede extends JFrame {
 	 * Create the frame.
 	 */
 	public RegistroHospede() {
+		super("Hospedes");
+		this.hospedesController = new HospedesController();
 		
 		setIconImage(Toolkit.getDefaultToolkit().getImage(RegistroHospede.class.getResource("/imagenes/lOGO-50PX.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -127,9 +136,11 @@ public class RegistroHospede extends JFrame {
 		btnAtras.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				ReservasView reservas = new ReservasView();
-				reservas.setVisible(true);
-				dispose();				
+						
+				ReservasView reserva = new ReservasView();
+				reserva.setVisible(true);
+				dispose();	
+							
 			}
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -284,6 +295,27 @@ public class RegistroHospede extends JFrame {
 		btnsalvar.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				try {
+					if (txtNome.getText() != null && txtSobrenome.getText() != null && txtDataN.getDate() != null && txtNacionalidade.getSelectedItem().toString() != null && txtTelefone.getText() != null ) {
+						salvarHospede();
+						System.out.println("Funciona!");
+						RegistroHospede hospede = new RegistroHospede();
+						hospede.setVisible(true);
+						dispose();	
+						JOptionPane.showMessageDialog(null, "Registro feito!");
+					}else {
+						JOptionPane.showMessageDialog(null, "Deve preencher todos os campos.");
+					}
+					
+				
+				} catch (Exception erro) {
+					System.out.println("ERRO" + erro);
+				}
+//				salvarHospede();
+				//RegistroHospede hospede = new RegistroHospede();
+				//hospede.setVisible(true);
+				//dispose();	
+				
 			}
 		});
 		btnsalvar.setLayout(null);
@@ -314,6 +346,25 @@ public class RegistroHospede extends JFrame {
 		panel.add(logo);
 		logo.setIcon(new ImageIcon(RegistroHospede.class.getResource("/imagenes/Ha-100px.png")));
 	}
+	
+public void salvarHospede() {
+		
+		try {
+			
+			String nome = (txtNome.getText());
+			String sobrenome = (txtSobrenome.getText());
+			String dataNascimento = ((JTextField)txtDataN.getDateEditor().getUiComponent()).getText();
+			String telefone = (txtTelefone.getText());
+			
+			Hospedes hospede = new Hospedes(nome, sobrenome, java.sql.Date.valueOf(dataNascimento), txtNacionalidade.getSelectedItem().toString(), telefone);
+			hospedesController.salvar(hospede);
+						
+		} catch (Exception e) {
+			System.out.println("ERRO" + e);
+		}
+
+	}
+	
 	
 	//Código que permite movimentar a janela pela tela seguindo a posição de "x" y "y"
 	 private void headerMousePressed(java.awt.event.MouseEvent evt) {
